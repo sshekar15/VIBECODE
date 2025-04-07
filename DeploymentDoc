@@ -1,0 +1,87 @@
+### Deployment Document for Cat Bounce Bonanza
+
+#### Project Overview
+**Cat Bounce Bonanza** is a fun browser-based game where players guide a cat to collect fish, dodge obstacles, and reach the goal! The project is implemented using HTML, CSS, and JavaScript, making it accessible on most modern web browsers.
+
+---
+
+#### How to Deploy the Project
+Follow these steps to deploy and run the game:
+
+##### 1. **Project Directory Setup**
+   - Create a folder for your project, e.g., `CatBounceBonanza/`.
+   - Inside the folder, organize the files as follows:
+     ```
+     CatBounceBonanza/
+     ├── index.html
+     ├── style.css
+     ├── script.js
+     ├── assets/
+         ├── cat.png
+         ├── fish.png
+         ├── platform.png
+     ```
+
+##### 2. **File Requirements**
+   - **HTML (`index.html`)**: Contains the game structure and instructions for players.
+   - **CSS (`style.css`)**: Handles the visual styling for the game.
+   - **JavaScript (`script.js`)**: Includes the logic for gameplay (movement, collisions, and level transitions).
+   - **Assets Folder**: Stores PNG images for sprites (cat, fish, platforms).
+
+---
+
+#### How to Run the Game
+##### Method 1: Open in a Browser
+1. Double-click the `index.html` file in your project folder.
+2. The game will open in your default web browser.
+3. Start playing!
+
+##### Method 2: Host Locally
+1. Install a simple HTTP server (e.g., Python or Node.js).
+2. Run the following command in the project folder:
+   - **Python**:
+     ```bash
+     python -m http.server
+     ```
+   - **Node.js**:
+     ```bash
+     npx http-server
+     ```
+3. Open your browser and go to `http://localhost:8000` (or the port displayed in your terminal).
+
+---
+
+#### How to Use the Game
+##### Gameplay Instructions:
+1. **Start the Game**:
+   - Click the "Start Game" button on the instructions screen to begin.
+2. **Controls**:
+   - Move the cat: Arrow keys (`Left`, `Right`) or `W`, `A`, `D`.
+   - Jump: Spacebar or `Up Arrow`.
+3. **Objectives**:
+   - Collect fish to earn points.
+   - Avoid obstacles like spikes.
+   - Reach the green goal block to progress to the next level.
+4. **Powerups**:
+   - **Catnip**: Jump higher temporarily.
+   - **Yarn**: Run faster for a short duration.
+   - **Laser**: Destroy obstacles with powerful beams.
+
+---
+
+#### Notes for Customization
+1. **Update Assets**:
+   - Replace images in the `assets/` folder with your own sprites.
+   - Ensure the paths in `script.js` are updated if new files are added.
+2. **Game Logic Adjustments**:
+   - Modify jump height, platform positions, or powerup effects in the `script.js` file.
+
+---
+
+#### Browser Compatibility
+Cat Bounce Bonanza is compatible with modern web browsers like:
+- Google Chrome
+- Mozilla Firefox
+- Microsoft Edge
+- Safari
+
