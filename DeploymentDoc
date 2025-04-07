@@ -9,17 +9,7 @@
 Follow these steps to deploy and run the game:
 
 ##### 1. **Project Directory Setup**
-   - Create a folder for your project, e.g., `CatBounceBonanza/`.
-   - Inside the folder, organize the files as follows:
-     ```
-     CatBounceBonanza/
-     ├── index.html
-     ├── style.css
-     ├── script.js
-     ├── assets/
-         ├── cat.png
-         ├── fish.png
-         ├── platform.png
+   - Download the catgamefolder.
      ```
 
 ##### 2. **File Requirements**
