@@ -106,29 +106,29 @@
     <div class="image-selector">
         <h3>Change Cat Character:</h3>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\470-4709362_orange-cat-cat-gifs-pixel-art-removebg-preview.png" alt="Orange Tabby" id="cat1" class="selected" data-img="cat1">
+            <img src="470-4709362_orange-cat-cat-gifs-pixel-art-removebg-preview.png" alt="Orange Tabby" id="cat1" class="selected" data-img="cat1">
         </div>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\st_small_507x507-pad_600x600_f8f8f8.u2-removebg-preview.png" alt="Black Cat" id="cat2" data-img="cat2">
+            <img src="st_small_507x507-pad_600x600_f8f8f8.u2-removebg-preview.png" alt="Black Cat" id="cat2" data-img="cat2">
         </div>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\istockphoto-1412670801-612x612-removebg-preview.png" alt="White Cat" id="cat3" data-img="cat3">
+            <img src="istockphoto-1412670801-612x612-removebg-preview.png" alt="White Cat" id="cat3" data-img="cat3">
         </div>
         
         <h3>Change Fish:</h3>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\f589c9ae89b9a792a073fe4ecf18fb3e-removebg-preview.png" alt="Gold Fish" id="fish1" class="selected" data-img="fish1">
+            <img src="f589c9ae89b9a792a073fe4ecf18fb3e-removebg-preview.png" alt="Gold Fish" id="fish1" class="selected" data-img="fish1">
         </div>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\images-removebg-preview.png" alt="Tuna" id="fish2" data-img="fish2">
+            <img src="images-removebg-preview.png" alt="Tuna" id="fish2" data-img="fish2">
         </div>
         
         <h3>Change Platform:</h3>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\8-bit-arcade-pixel-art-game-palm-sand-platforms-vector-removebg-preview.png" alt="Sand Platform" id="platform1" class="selected" data-img="platform1">
+            <img src="8-bit-arcade-pixel-art-game-palm-sand-platforms-vector-removebg-preview.png" alt="Sand Platform" id="platform1" class="selected" data-img="platform1">
         </div>
         <div class="image-option">
-            <img src="C:\Users\sshekar\Downloads\ground-platforms-for-platform-video-games-on-white-background-pictogram-icon-set-illustration-2RATHA5-removebg-preview.png" alt="Grass Platform" id="platform2" data-img="platform2">
+            <img src="ground-platforms-for-platform-video-games-on-white-background-pictogram-icon-set-illustration-2RATHA5-removebg-preview.png" alt="Grass Platform" id="platform2" data-img="platform2">
         </div>
     </div>
 
