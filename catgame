@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Bounce Bonanza</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas {
+            border: 3px solid #4b0082;
+            margin-top: 20px;
+            background-color: #87ceeb;
+        }
+        .controls {
+            margin: 20px;
+            padding: 10px;
+            background-color: #e0e0ff;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4b0082;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .image-selector {
+            margin: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .image-option {
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .image-option img {
+            width: 50px;
+            height: 50px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+        }
+        .image-option img.selected {
+            border-color: #ff4500;
+        }
+        button {
+            background-color: #4b0082;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #6a0dad;
+        }
+        .stat {
+            display: inline-block;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐱 Cat Bounce Bonanza 🐱</h1>
+
+    <!-- Game Instructions -->
+    <div class="instructions">
+        <h2>How to Play</h2>
+        <p>Welcome to Cat Bounce Bonanza! Your mission is to guide the cat to collect fish, avoid obstacles, and reach the goal.</p>
+        <ul>
+            <li>Use <strong>Arrow Keys</strong> or <strong>WASD</strong> to move the cat.</li>
+            <li>Press <strong>Space</strong> to jump.</li>
+            <li>Collect fish for points and powerups for special abilities.</li>
+            <li color = "#637f40"><strong>Catnip:</strong> Increases your jump height temporarily and is green.</li>
+            <li color = '#400C60'><strong>Yarn:</strong> Boosts your running speed for a short duration and is purple.</li>
+            <li color = '#ff4b33'><strong>Laser:</strong> Lets you destroy obstacles with powerful beams and is red.</li>
+            <li>Avoid dangerous obstacles, like spikes.</li>
+            <li>Reach the green goal block to proceed to the next level.</li>
+        </ul>
+        <p>Good luck!</p>
+    </div>
+    
+    <div class="controls">
+        <div class="stat">Level: <span id="level">1</span></div>
+        <div class="stat">Score: <span id="score">0</span></div>
+        <div class="stat">Fish: <span id="fish">0</span></div>
+        <div class="stat">Lives: <span id="lives">3</span></div>
+        <button id="resetBtn">Reset Game</button>
+        <button id="pauseBtn">Pause</button>
+    </div>
+    
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <div class="image-selector">
+        <h3>Change Cat Character:</h3>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\470-4709362_orange-cat-cat-gifs-pixel-art-removebg-preview.png" alt="Orange Tabby" id="cat1" class="selected" data-img="cat1">
+        </div>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\st_small_507x507-pad_600x600_f8f8f8.u2-removebg-preview.png" alt="Black Cat" id="cat2" data-img="cat2">
+        </div>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\istockphoto-1412670801-612x612-removebg-preview.png" alt="White Cat" id="cat3" data-img="cat3">
+        </div>
+        
+        <h3>Change Fish:</h3>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\f589c9ae89b9a792a073fe4ecf18fb3e-removebg-preview.png" alt="Gold Fish" id="fish1" class="selected" data-img="fish1">
+        </div>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\images-removebg-preview.png" alt="Tuna" id="fish2" data-img="fish2">
+        </div>
+        
+        <h3>Change Platform:</h3>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\8-bit-arcade-pixel-art-game-palm-sand-platforms-vector-removebg-preview.png" alt="Sand Platform" id="platform1" class="selected" data-img="platform1">
+        </div>
+        <div class="image-option">
+            <img src="C:\Users\sshekar\Downloads\ground-platforms-for-platform-video-games-on-white-background-pictogram-icon-set-illustration-2RATHA5-removebg-preview.png" alt="Grass Platform" id="platform2" data-img="platform2">
+        </div>
+    </div>
+
+    <script>
+        // Game initialization
+        window.onload = function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const resetBtn = document.getElementById('resetBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            // Game state
+            let gameState = {
+                score: 0,
+                fishCollected: 0,
+                level: 1,
+                lives: 3,
+                paused: false,
+                gameOver: false,
+                images: {
+                    currentCat: 'cat1',
+                    currentFish: 'fish1',
+                    currentPlatform: 'platform1'
+                }
+            };
+            
+            // Image placeholders - in a real game, these would be actual images
+            const images = {
+                cat1: { color: '#FFA500', width: 40, height: 30 }, // Orange tabby
+                cat2: { color: '#333333', width: 40, height: 30 }, // Black cat
+                cat3: { color: 'white', width: 40, height: 30 }, // Royal cat (white)
+                fish1: { color: '#FFD700', width: 20, height: 15 }, // Gold fish
+                fish2: { color: 'pink', width: 20, height: 15 }, // Tuna (blue)
+                platform1: { color: '#C2B280', width: 100, height: 20 }, // sand platform
+                platform2: { color: '#3e5c20', width: 100, height: 20 }, // grass platform
+                catnip: { color: '#637f40', width: 20, height: 20 }, //green
+                laser: { color: '#ff4b33', width: 20, height: 20 }, //red
+                yarn: { color: '#400C60', width: 20, height: 20 }//purple
+            };
+            
+            // Cat properties
+            const cat = {
+                x: 50,
+                y: canvas.height - 100,
+                width: 40,
+                height: 30,
+                velocityX: 0,
+                velocityY: 0,
+                jumpForce: -10,
+                gravity: 0.5,
+                speed: 5,
+                isJumping: false,
+                hasPowerup: false,
+                powerupType: null,
+                powerupTimer: 0,
+                animate() {
+                    // Simple "bouncing" animation
+                    this.y += Math.sin(Date.now() / 200) * 0.5;
+                }
+            };
+            
+            // Levels configuration
+            const levels = [
+                // Level 1 - Kitty Playground
+                {
+                    name: "Kitty Playground",
+                    backgroundColor: '#87CEEB',
+                    platforms: [
+                        { x: 0, y: canvas.height - 20, width: canvas.width, height: 20, type: 'normal' }, // Ground
+                        { x: 150, y: canvas.height - 100, width: 100, height: 20, type: 'normal' },
+                        { x: 320, y: canvas.height - 180, width: 100, height: 20, type: 'normal' },
+                        { x: 500, y: canvas.height - 220, width: 100, height: 20, type: 'bouncy' },
+                        { x: 650, y: canvas.height - 150, width: 100, height: 20, type: 'normal' }
+                    ],
+                    fish: [
+                        { x: 180, y: canvas.height - 150, collected: false },
+                        { x: 350, y: canvas.height - 210, collected: false },
+                        { x: 520, y: canvas.height - 250, collected: false }
+                    ],
+                    powerups: [
+                        { x: 500, y: canvas.height - 250, type: 'catnip', collected: false }
+                    ],
+                    obstacles: [
+                        { x: 400, y: canvas.height - 40, width: 30, height: 20, type: 'spike' }
+                    ],
+                    goal: { x: canvas.width - 50, y: canvas.height - 70, width: 30, height: 50 }
+                },
+                // Level 2 - Fish Market Madness
+                {
+                    name: "Fish Market Madness",
+                    backgroundColor: '#B0E0E6',
+                    platforms: [
+                        { x: 0, y: canvas.height - 20, width: canvas.width, height: 20, type: 'slippery' }, // Ground
+                        { x: 100, y: canvas.height - 100, width: 80, height: 20, type: 'normal' },
+                        { x: 240, y: canvas.height - 160, width: 80, height: 20, type: 'normal' },
+                        { x: 380, y: canvas.height - 220, width: 80, height: 20, type: 'normal' },
+                        { x: 520, y: canvas.height - 160, width: 80, height: 20, type: 'slippery' },
+                        { x: 650, y: canvas.height - 100, width: 80, height: 20, type: 'bouncy' }
+                    ],
+                    fish: [
+                        { x: 120, y: canvas.height - 130, collected: false },
+                        { x: 260, y: canvas.height - 190, collected: false },
+                        { x: 400, y: canvas.height - 250, collected: false },
+                        { x: 670, y: canvas.height - 130, collected: false }
+                    ],
+                    powerups: [
+                        { x: 520, y: canvas.height - 190, type: 'laser', collected: false }
+                    ],
+                    obstacles: [
+                        { x: 300, y: canvas.height - 40, width: 30, height: 20, type: 'spike' },
+                        { x: 500, y: canvas.height - 40, width: 30, height: 20, type: 'spike' }
+                    ],
+                    goal: { x: canvas.width - 50, y: canvas.height - 70, width: 30, height: 50 }
+                },
+                // Level 3 - Cat Café Chaos
+                {
+                    name: "Cat Café Chaos",
+                    backgroundColor: '#FFF0F5',
+                    platforms: [
+                        { x: 0, y: canvas.height - 20, width: canvas.width, height: 20, type: 'normal' }, // Ground
+                        { x: 80, y: canvas.height - 90, width: 80, height: 20, type: 'normal' },
+                        { x: 200, y: canvas.height - 150, width: 80, height: 20, type: 'normal' },
+                        { x: 320, y: canvas.height - 210, width: 80, height: 20, type: 'normal' },
+                        { x: 450, y: canvas.height - 270, width: 80, height: 20, type: 'bouncy' },
+                        { x: 580, y: canvas.height - 210, width: 80, height: 20, type: 'slippery' },
+                        { x: 700, y: canvas.height - 150, width: 80, height: 20, type: 'normal' }
+                    ],
+                    fish: [
+                        { x: 100, y: canvas.height - 120, collected: false },
+                        { x: 220, y: canvas.height - 180, collected: false },
+                        { x: 340, y: canvas.height - 240, collected: false },
+                        { x: 470, y: canvas.height - 300, collected: false },
+                        { x: 600, y: canvas.height - 240, collected: false },
+                        { x: 720, y: canvas.height - 180, collected: false }
+                    ],
+                    powerups: [
+                        { x: 470, y: canvas.height - 330, type: 'yarn', collected: false }
+                    ],
+                    obstacles: [
+                        { x: 250, y: canvas.height - 40, width: 30, height: 20, type: 'spike' },
+                        { x: 400, y: canvas.height - 40, width: 30, height: 20, type: 'spike' },
+                        { x: 550, y: canvas.height - 40, width: 30, height: 20, type: 'spike' }
+                    ],
+                    goal: { x: canvas.width - 50, y: canvas.height - 70, width: 30, height: 50 }
+                }
+            ];
+            
+            let currentLevel = 0;
+            let level = levels[currentLevel];
+            
+            // Key states
+            const keys = {
+                left: false,
+                right: false,
+                up: false
+            };
+            
+            // Event listeners
+            document.addEventListener('keydown', keyDownHandler);
+            document.addEventListener('keyup', keyUpHandler);
+            resetBtn.addEventListener('click', resetGame);
+            pauseBtn.addEventListener('click', togglePause);
+            
+            // Set up image selectors
+            document.querySelectorAll('.image-option img').forEach(img => {
+                img.addEventListener('click', function() {
+                    const type = this.getAttribute('data-img').replace(/[0-9]/g, '');
+                    const id = this.getAttribute('data-img');
+                    
+                    // Update selected image
+                    document.querySelectorAll(`.image-option img[data-img^="${type}"]`).forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    // Update game state
+                    if (type === 'cat') {
+                        gameState.images.currentCat = id;
+                    } else if (type === 'fish') {
+                        gameState.images.currentFish = id;
+                    } else if (type === 'platform') {
+                        gameState.images.currentPlatform = id;
+                    }
+                });
+            });
+            
+            function keyDownHandler(e) {
+                if (e.key === 'ArrowLeft' || e.key === 'a') {
+                    keys.left = true;
+                } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                    keys.right = true;
+                } else if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') && !cat.isJumping) {
+                    keys.up = true;
+                    cat.isJumping = true;
+                    cat.velocityY = cat.jumpForce;
+                } else if (e.key === 'p') {
+                    togglePause();
+                }
+            }
+            
+            function keyUpHandler(e) {
+                if (e.key === 'ArrowLeft' || e.key === 'a') {
+                    keys.left = false;
+                } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                    keys.right = false;
+                } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') {
+                    keys.up = false;
+                }
+            }
+            
+            function togglePause() {
+                gameState.paused = !gameState.paused;
+                pauseBtn.textContent = gameState.paused ? 'Resume' : 'Pause';
+            }
+            
+            function resetGame() {
+                gameState = {
+                    score: 0,
+                    fishCollected: 0,
+                    level: 1,
+                    lives: 3,
+                    paused: false,
+                    gameOver: false,
+                    images: gameState.images // Keep the current image selections
+                };
+                
+                currentLevel = 0;
+                level = levels[currentLevel];
+                resetLevel();
+                updateUI();
+            }
+            
+            function resetLevel() {
+                cat.x = 50;
+                cat.y = canvas.height - 100;
+                cat.velocityX = 0;
+                cat.velocityY = 0;
+                cat.isJumping = false;
+                cat.hasPowerup = false;
+                cat.powerupType = null;
+                cat.powerupTimer = 0;
+                
+                // Reset collectibles
+                level.fish.forEach(fish => {
+                    fish.collected = false;
+                });
+                
+                level.powerups.forEach(powerup => {
+                    powerup.collected = false;
+                });
+            }
+            
+            function nextLevel() {
+                currentLevel++;
+                if (currentLevel < levels.length) {
+                    level = levels[currentLevel];
+                    gameState.level++;
+                    resetLevel();
+                } else {
+                    // Game completed
+                    gameState.gameOver = true;
+                }
+                updateUI();
+            }
+            
+            function updateUI() {
+                document.getElementById('level').textContent = gameState.level;
+                document.getElementById('score').textContent = gameState.score;
+                document.getElementById('fish').textContent = gameState.fishCollected;
+                document.getElementById('lives').textContent = gameState.lives;
+            }
+            
+            function update() {
+                if (gameState.paused || gameState.gameOver) return;
+                
+                // Apply gravity
+                cat.velocityY += cat.gravity;
+                
+                // Move cat horizontally
+                if (keys.left) {
+                    cat.velocityX = -cat.speed;
+                    if (cat.hasPowerup && cat.powerupType === 'yarn') {
+                        cat.velocityX *= 1.5;
+                    }
+                } else if (keys.right) {
+                    cat.velocityX = cat.speed;
+                    if (cat.hasPowerup && cat.powerupType === 'yarn') {
+                        cat.velocityX *= 1.5;
+                    }
+                } else {
+                    cat.velocityX *= 0.9; // Friction
+                }
+                
+                // Update cat position
+                cat.x += cat.velocityX;
+                cat.y += cat.velocityY;
+                
+                // Simple animation
+                cat.animate = function() {
+    // Only animate if not grounded or on a platform
+    if (cat.isJumping || !checkCollisionsAndPlatforms()) {
+        this.y += Math.sin(Date.now() / 200) * 0.5;
+    }
+};
+
+                
+                // Boundary checking
+                if (cat.x < 0) {
+                    cat.x = 0;
+                } else if (cat.x + cat.width > canvas.width) {
+                    cat.x = canvas.width - cat.width;
+                }
+                
+                // Check for platform collisions
+                let onPlatform = false;
+                checkCollisionsAndPlatforms(onPlatform);
+                level.platforms.forEach(platform => {
+                    if (checkCollision(cat, platform)) {
+                        const overlapX = (cat.x + cat.width) - platform.x > 0 && cat.x < platform.x + platform.width;
+                        const overlapY = (cat.y + cat.height) - platform.y > 0 && cat.y < platform.y + platform.height;
+                        
+                        // Collision from above (landing on platform)
+                        if (overlapX && cat.velocityY > 0 && cat.y + cat.height - cat.velocityY <= platform.y) {
+                            cat.y = platform.y - cat.height;
+                            cat.velocityY = 0;
+                            cat.isJumping = false;
+                            onPlatform = true;
+                            
+                            // Platform effects
+                            if (platform.type === 'bouncy') {
+                                cat.velocityY = cat.jumpForce * 1.5;
+                                cat.isJumping = true;
+                            } else if (platform.type === 'slippery') {
+                                cat.velocityX *= 1.05; // More slippery
+                            }
+                        }
+                        // Collision from below (hitting platform from below)
+                        else if (overlapX && cat.velocityY < 0 && cat.y >= platform.y + platform.height - Math.abs(cat.velocityY)) {
+                            cat.y = platform.y + platform.height;
+                            cat.velocityY = 0;
+                        }
+                        // Collision from sides
+                        else if (overlapY && cat.velocityX !== 0) {
+                            if (cat.x + cat.width - Math.abs(cat.velocityX) <= platform.x) {
+                                cat.x = platform.x - cat.width;
+                            } else if (cat.x >= platform.x + platform.width - Math.abs(cat.velocityX)) {
+                                cat.x = platform.x + platform.width;
+                            }
+                            cat.velocityX = 0;
+                        }
+                    }
+                });
+                
+                // If falling off the screen
+                if (cat.y > canvas.height) {
+                    gameState.lives--;
+                    updateUI();
+                    
+                    if (gameState.lives <= 0) {
+                        gameState.gameOver = true;
+                    } else {
+                        resetLevel();
+                    }
+                }
+                
+                // Check for fish collection
+                level.fish.forEach(fish => {
+                    if (!fish.collected && checkCollision(cat, { x: fish.x, y: fish.y, width: 20, height: 15 })) {
+                        fish.collected = true;
+                        gameState.score += 50;
+                        gameState.fishCollected++;
+                        updateUI();
+                    }
+                });
+                
+                // Check for powerup collection
+                level.powerups.forEach(powerup => {
+                    if (!powerup.collected && checkCollision(cat, { x: powerup.x, y: powerup.y, width: 20, height: 20 })) {
+                        powerup.collected = true;
+                        cat.hasPowerup = true;
+                        cat.powerupType = powerup.type;
+                        cat.powerupTimer = 300; // 5 seconds (60 FPS * 5)
+                        
+                        // Apply powerup effects
+                        if (powerup.type === 'catnip') {
+                            cat.jumpForce *= 1.5;
+                        }
+                        
+                        gameState.score += 100;
+                        updateUI();
+                    }
+                });
+                
+                // Check for obstacle collisions
+                level.obstacles.forEach(obstacle => {
+                    if (checkCollision(cat, obstacle) && !(cat.hasPowerup && cat.powerupType === 'yarn')) {
+                        gameState.lives--;
+                        updateUI();
+                        
+                        if (gameState.lives <= 0) {
+                            gameState.gameOver = true;
+                        } else {
+                            resetLevel();
+                        }
+                    }
+                });
+                
+                // Check for goal
+                if (checkCollision(cat, level.goal)) {
+                    // Calculate level completion bonus
+                    const fishBonus = level.fish.filter(f => f.collected).length * 100;
+                    gameState.score += 500 + fishBonus; // Base level completion + fish bonus
+                    updateUI();
+                    nextLevel();
+                }
+                
+                // Update powerup timer
+                if (cat.hasPowerup) {
+                    cat.powerupTimer--;
+                    if (cat.powerupTimer <= 0) {
+                        cat.hasPowerup = false;
+                        
+                        // Remove powerup effects
+                        if (cat.powerupType === 'catnip') {
+                            cat.jumpForce = -10; // Reset to normal
+                        }
+                        
+                        cat.powerupType = null;
+                    }
+                }
+            }
+            
+            function checkCollision(obj1, obj2) {
+                return obj1.x < obj2.x + obj2.width &&
+                       obj1.x + obj1.width > obj2.x &&
+                       obj1.y < obj2.y + obj2.height &&
+                       obj1.y + obj1.height > obj2.y;
+            }
+            
+            function draw() {
+                // Clear canvas and set background
+                ctx.fillStyle = level.backgroundColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw platforms
+                level.platforms.forEach(platform => {
+                    const platformImg = images[gameState.images.currentPlatform];
+                    ctx.fillStyle = platformImg.color;
+                    
+                    // Different visuals for different platform types
+                    if (platform.type === 'bouncy') {
+                        ctx.fillStyle = '#FF6347'; // Red-orange for bouncy
+                    } else if (platform.type === 'slippery') {
+                        ctx.fillStyle = '#87CEFA'; // Light blue for slippery
+                    }
+                    
+                    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                });
+                
+                // Draw fish
+                level.fish.forEach(fish => {
+                    if (!fish.collected) {
+                        const fishImg = images[gameState.images.currentFish];
+                        ctx.fillStyle = fishImg.color;
+                        ctx.fillRect(fish.x, fish.y, fishImg.width, fishImg.height);
+                    }
+                });
+                
+                // Draw powerups
+                level.powerups.forEach(powerup => {
+                    if (!powerup.collected) {
+                        ctx.fillStyle = images[powerup.type].color;
+                        ctx.fillRect(powerup.x, powerup.y, 20, 20);
+                    }
+                });
+                
+                // Draw obstacles
+                level.obstacles.forEach(obstacle => {
+                    ctx.fillStyle = '#FF0000'; // Red for danger
+                    ctx.beginPath();
+                    if (obstacle.type === 'spike') {
+                        // Draw a triangle for spike
+                        ctx.moveTo(obstacle.x, obstacle.y + obstacle.height);
+                        ctx.lineTo(obstacle.x + obstacle.width / 2, obstacle.y);
+                        ctx.lineTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height);
+                        ctx.closePath();
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    }
+                });
+                
+                // Draw goal
+                ctx.fillStyle = '#00FF00'; // Green
+                ctx.fillRect(level.goal.x, level.goal.y, level.goal.width, level.goal.height);
+                
+                // Draw cat
+                const catImg = images[gameState.images.currentCat];
+                ctx.fillStyle = catImg.color;
+                
+                // If cat has powerup, add visual effect
+                if (cat.hasPowerup) {
+                    ctx.save();
+                    ctx.globalAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 100);
+                    
+                    if (cat.powerupType === 'catnip') {
+                        ctx.fillStyle = '#00FF00'; // Green glow
+                    } else if (cat.powerupType === 'laser') {
+                        ctx.fillStyle = '#FF0000'; // Red glow
+                    } else if (cat.powerupType === 'yarn') {
+                        ctx.fillStyle = '#FF1493'; // Pink glow
+                    }
+                    
+                    ctx.fillRect(cat.x - 5, cat.y - 5, catImg.width + 10, catImg.height + 10);
+                    ctx.restore();
+                }
+                
+                ctx.fillStyle = catImg.color;
+                ctx.fillRect(cat.x, cat.y, catImg.width, catImg.height);
+                
+                // Draw eyes and face details
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(cat.x + 10, cat.y + 8, 5, 5); // Left eye
+                ctx.fillRect(cat.x + 25, cat.y + 8, 5, 5); // Right eye
+                
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(cat.x + 12, cat.y + 10, 2, 2); // Left pupil
+                ctx.fillRect(cat.x + 27, cat.y + 10, 2, 2); // Right pupil
+                
+                // Draw a smile
+                ctx.beginPath();
+                ctx.arc(cat.x + 20, cat.y + 18, 5, 0, Math.PI);
+                ctx.stroke();
+                
+                // Draw game state messages
+                if (gameState.paused) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Press P or click Pause button to resume', canvas.width / 2, canvas.height / 2 + 30);
+                } else if (gameState.gameOver) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    
+                    if (currentLevel >= levels.length) {
+                        ctx.fillText('YOU WON!', canvas.width / 2, canvas.height / 2 - 30);
+                        ctx.font = '20px Arial';
+                        ctx.fillText(`Final Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2 + 10);
+                    } else {
+                        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 30);
+                        ctx.font = '20px Arial';
+                        ctx.fillText(`Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2 + 10);
+                    }
+                    
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Click Reset to play again', canvas.width / 2, canvas.height / 2 + 50);
+                }
+                
+                // Draw level name
+                ctx.fillStyle = '#000000';
+                ctx.font = '18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(level.name, canvas.width / 2, 30);
+                
+                // Draw controls guide
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('Controls: Arrow Keys or WASD to move, Space to jump', 10, 20);
+            }
+            
+            function gameLoop() {
+                update();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+            
+            // Initialize the game
+            resetLevel();
+            updateUI();
+            gameLoop();
+        };
+    // Initialize the game state
+let gameState = {
+    score: 0,
+    lives: 3,
+    paused: false,
+    gameOver: false,
+    fishCollected: 0,
+    images: {
+        currentCat: 0, // Keep track of the cat's sprite
+        currentFish: 0, // Keep track of the fish sprite
+        currentPlatform: 0 // Keep track of the platform sprite
+    }
+};
+
+let cat = {
+    x: 50,
+    y: 300,
+    width: 40,
+    height: 40,
+    velocityX: 0,
+    velocityY: 0,
+    jumpForce: -10,  // Initial jump force
+    isJumping: false,
+    isFalling: true,
+    hasPowerup: false,
+    powerupType: null,
+    powerupTimer: 0
+};
+
+let level = {
+    name: 'Level 1',
+    platforms: [
+        { x: 100, y: 450, width: 200, height: 10, type: 'normal' },
+        { x: 350, y: 300, width: 200, height: 10, type: 'bouncy' }
+    ],
+    fish: [
+        { x: 120, y: 380, collected: false },
+        { x: 370, y: 280, collected: false }
+    ],
+    powerups: [
+        { x: 200, y: 350, type: 'catnip', collected: false }
+    ],
+    obstacles: [
+        { x: 250, y: 390, width: 20, height: 10, type: 'spike' }
+    ],
+    goal: { x: 500, y: 250, width: 30, height: 30 }
+};
+
+let currentLevel = 0;
+let canvas = document.getElementById("gameCanvas");
+let ctx = canvas.getContext("2d");
+
+// Load images (for sprites, here we just use colors for simplicity)
+let images = {
+    cat: { color: '#FF6347', width: 40, height: 40 },
+    fish: { color: '#00FFFF', width: 20, height: 15 },
+    platform: { color: '#8B4513', width: 200, height: 10 }
+};
+
+// Game loop
+function gameLoop() {
+    if (!gameState.paused && !gameState.gameOver) {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+// Handle keyboard input for movement
+let keys = {};
+
+window.addEventListener("keydown", function(event) {
+    keys[event.key] = true;
+}, false);
+
+window.addEventListener("keyup", function(event) {
+    keys[event.key] = false;
+}, false);
+
+function handleInput() {
+    if (keys["ArrowLeft"] || keys["a"]) {
+        cat.velocityX = -5;
+    } else if (keys["ArrowRight"] || keys["d"]) {
+        cat.velocityX = 5;
+    } else {
+        cat.velocityX = 0;
+    }
+
+    if (keys[" "] && !cat.isJumping && !cat.isFalling) {
+        cat.velocityY = cat.jumpForce;
+        cat.isJumping = true;
+    }
+}
+
+// Update game state
+function update() {
+    handleInput();
+
+    // Apply gravity if the cat is not on a platform
+    if (!checkCollisionsAndPlatforms()) {
+        cat.velocityY += 0.5; // Gravity effect
+    }
+
+    // Update cat's position
+    cat.x += cat.velocityX;
+    cat.y += cat.velocityY;
+
+    // Boundary checking
+    if (cat.x < 0) {
+        cat.x = 0;
+    } else if (cat.x + cat.width > canvas.width) {
+        cat.x = canvas.width - cat.width;
+    }
+
+    // Check for falling off the canvas
+    if (cat.y > canvas.height) {
+        gameState.lives--;
+        if (gameState.lives <= 0) {
+            gameState.gameOver = true;
+        } else {
+            resetLevel();
+        }
+    }
+}
+
+
+    checkCollisionsAndPlatforms();
+
+    // Update power-up timers if active
+    if (cat.hasPowerup) {
+        cat.powerupTimer--;
+        if (cat.powerupTimer <= 0) {
+            cat.hasPowerup = false;
+            cat.powerupType = null;
+            cat.jumpForce = -10; // Reset jump force to default
+        }
+    }
+
+
+// Platform and obstacle collision handling
+function checkCollisionsAndPlatforms() {
+    let onPlatform = false;
+
+    level.platforms.forEach(platform => {
+        if (checkCollision(cat, platform)) {
+            if (cat.velocityY > 0 && cat.y + cat.height - cat.velocityY <= platform.y) {
+                cat.y = platform.y - cat.height; // Align the cat to the platform
+                cat.velocityY = 0; // Stop downward velocity
+                cat.isJumping = false; // Reset jumping state
+                onPlatform = true;
+
+                // Handle platform effects
+                if (platform.type === 'bouncy') {
+                    cat.velocityY = cat.jumpForce * 1.5; // Bounce higher
+                    cat.isJumping = true; // Continue jumping
+                }
+            }
+        }
+    });
+
+    if (!onPlatform && cat.y + cat.height >= canvas.height) {
+        // Land on the ground
+        cat.y = canvas.height - cat.height;
+        cat.velocityY = 0;
+        cat.isJumping = false;
+        onPlatform = true;
+    }
+
+    return onPlatform;
+}
+
+
+    // Fish collection
+    level.fish.forEach(fish => {
+        if (!fish.collected && checkCollision(cat, { x: fish.x, y: fish.y, width: 20, height: 15 })) {
+            fish.collected = true;
+            gameState.score += 50;
+        }
+    });
+
+    // Goal check
+    if (checkCollision(cat, level.goal)) {
+        const fishBonus = level.fish.filter(f => f.collected).length * 100;
+        gameState.score += 500 + fishBonus;
+        nextLevel();
+    }
+
+
+// Collision detection function
+function checkCollision(obj1, obj2) {
+    return obj1.x < obj2.x + obj2.width &&
+           obj1.x + obj1.width > obj2.x &&
+           obj1.y < obj2.y + obj2.height &&
+           obj1.y + obj1.height > obj2.y;
+}
+
+// Reset level (restarting after falling off or level completion)
+function resetLevel() {
+    cat.x = 50;
+    cat.y = canvas.height - cat.height; // Start the cat on the ground
+    cat.velocityX = 0;
+    cat.velocityY = 0;
+    cat.isJumping = false;
+    cat.isFalling = false; // Stop falling behavior
+    cat.hasPowerup = false;
+    cat.powerupType = null;
+    cat.powerupTimer = 0;
+
+    // Reset fish and powerups
+    level.fish.forEach(fish => fish.collected = false);
+    level.powerups.forEach(powerup => powerup.collected = false);
+}
+
+
+// Move to the next level
+function nextLevel() {
+    currentLevel++;
+    if (currentLevel < levels.length) {
+        resetLevel();
+        updateUI();
+    } else {
+        gameState.gameOver = true;
+    }
+}
+
+// Draw all elements on the canvas
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.fillStyle = '#87CEFA'; // Background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw platforms
+    level.platforms.forEach(platform => {
+        ctx.fillStyle = platform.type === 'bouncy' ? '#FF6347' : '#8B4513'; // Red for bouncy, brown for normal
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    });
+
+    // Draw fish
+    level.fish.forEach(fish => {
+        if (!fish.collected) {
+            ctx.fillStyle = images.fish.color;
+            ctx.fillRect(fish.x, fish.y, images.fish.width, images.fish.height);
+        }
+    });
+
+    // Draw goal
+    ctx.fillStyle = '#00FF00'; // Green
+    ctx.fillRect(level.goal.x, level.goal.y, level.goal.width, level.goal.height);
+
+    // Draw cat
+    ctx.fillStyle = images.cat.color;
+    ctx.fillRect(cat.x, cat.y, images.cat.width, images.cat.height);
+
+    // Display score and lives
+    ctx.fillStyle = '#000000';
+    ctx.font = '20px Arial';
+    ctx.fillText(`Score: ${gameState.score}`, 10, 30);
+    ctx.fillText(`Lives: ${gameState.lives}`, 10, 60);
+
+    // Display game over message
+    if (gameState.gameOver) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+    }
+
+    // Display paused message
+    if (gameState.paused) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+    }
+}
+
+// Start the game
+function startGame() {
+    resetLevel();
+    gameState.gameOver = false;
+    gameState.lives = 3;
+    gameState.score = 0;
+    gameState.fishCollected = 0;
+    gameState.paused = false;
+    gameLoop();
+}
+
+document.getElementById('resetButton').addEventListener('click', startGame);
+startGame();
+
+    </script>
+</body>
+</html>
